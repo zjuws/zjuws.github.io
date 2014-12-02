@@ -6,7 +6,8 @@ tagline: 个人博客
 {% include JB/setup %}
 
 我的CSDN博客： [ACM术](http://blog.csdn.net/fnzsjt)
-
+##哦哦&玉米
+	属于我们2个人的博客
 
     
 ## 博客文章
