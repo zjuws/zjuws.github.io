@@ -10,8 +10,8 @@ highlighter: pygments
 #
 title : 一米阳光的博客
 tagline: Site Tagline
-author : zjuws
-  name : shu wang
+author :
+  name : shuwang
   email : 315876632@qq.com
   github : zjuws
   twitter : username
