@@ -8,10 +8,10 @@ highlighter: pygments
 # Themes are encouraged to use these universal variables 
 # so be sure to set them if your theme uses them.
 #
-title : 一米阳光的博客
+title : 玉米阳光的博客
 tagline: Site Tagline
 author :
-  name : shuwang
+  name : Shu Wang
   email : 315876632@qq.com
   github : zjuws
   twitter : username
