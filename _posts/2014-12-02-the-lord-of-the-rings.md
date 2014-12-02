@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "游戏内容与魔戒背景的整合"
+title: "The Lord Of The Rings"
 description: "策划"
 category: 策划
 tags: [魔戒,游戏,种族]
