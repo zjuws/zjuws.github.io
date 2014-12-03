@@ -7,7 +7,7 @@ tagline: 个人博客
 
 `我的CSDN博客：` [ACM术](http://blog.csdn.net/fnzsjt)
 
-![hello](http://zjuws.githu.io/images/go.jpg)
+![hello](https://github.com/zjuws/zjuws.github.io/blob/master/images/go.jpg)
 
 ### 每日一句
 
