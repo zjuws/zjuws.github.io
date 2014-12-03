@@ -8,7 +8,7 @@ tagline: 个人博客
 `我的CSDN博客：` [ACM术](http://blog.csdn.net/fnzsjt)
 
 
-![image](http://cl.ly/image/0X1i3g2O1j3D/go.jpg)
+![image](http://bolgimage.qiniudn.com/go.jpg)
 
 
 ### 每日一句
