@@ -182,6 +182,7 @@ Mac 下的 Homebrew 居然内置了 LuaRocks 的安装包（之前安装 Lua，�
 	         
 	    end
 	end 
+{% endhighlight %}
 
 {% highlight lua %}
 	
@@ -215,6 +216,7 @@ Mac 下的 Homebrew 居然内置了 LuaRocks 的安装包（之前安装 Lua，�
 	        end
     	end
     end
+
 {% endhighlight %} 
 
 感谢[D.H.Q的烂笔头](http://dhq.me/luasocket-network-lua-module)
