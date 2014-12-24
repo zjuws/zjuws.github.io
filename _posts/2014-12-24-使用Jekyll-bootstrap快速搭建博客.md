@@ -165,7 +165,7 @@ rake指令会自动创建当前日期的Markdown格式的文件，保存在_post
      	prettyPrint();
 	})
 	
-[google代码样式下载地址](http://jmblog.github.io/color-themes-for-google-code-prettify/
+[google代码样式下载地址](http://jmblog.github.io/color-themes-for-google-code-prettify/)
 
 ##Jekyll基本结构
 
