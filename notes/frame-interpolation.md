@@ -5,17 +5,14 @@ permalink: /notes/frame-interpolation.html
 ---
 
 FIELD NOTES / FRAME INTERPOLATION
-
 {: .eyebrow }
 
 # 轻量级 GPU 插帧：<br>从运动估计到帧融合
 
 先用四张图理解“找运动、搬像素、判断遮挡、融合颜色”，再对照 FSR 3 的公开流程和 Shader 实现。
-
 {: .intro }
 
 2026.10.04 · 公开算法与参考实现
-
 {: .article-meta }
 
 <div class="notice" markdown="1">
@@ -190,12 +187,12 @@ AMD 的公开流程分别建立游戏运动与光流场，利用遮挡掩码拒�
 
 先区分全局 FFT 相位相关与局部相位表示：前者通常用于块或全局平移匹配；局部相位方法通过多尺度、多个方向的复数滤波响应描述运动。本文讲解后者。
 
-```
+~~~
 R(s,o,x) = A(s,o,x) · exp(i φ(s,o,x))
 Δφ = atan2(sin(φ₁-φ₀), cos(φ₁-φ₀))
 局部平移近似：Δφ ≈ -kᵀ d
 k [2×1]：子带局部波矢；d [2×1]：像素位移
-```
+~~~
 
 用固定频率的局部正弦信号理解：平移改变相位而不必改变幅度。多个方向给出位移在不同轴上的约束，只有方向覆盖充分、响应可靠，二维位移才可辨识。相位是周期量，直接相减会遇到 ±π 分支；大运动需要粗尺度提供约束，不能简单以主值相位差恢复任意位移。
 
@@ -203,13 +200,13 @@ k [2×1]：子带局部波矢；d [2×1]：像素位移
 
 <ol><li>通过可重建的复数可转向金字塔，得到每层、每方向的实部与虚部；它不是普通 MIP 金字塔。</li><li>Compute Pass 计算幅度、相位差和可靠性，弱幅度区域降低权重。</li><li>如果走运动估计路径，用多方向的加权约束求解位移，并借助粗尺度处理相位展开。</li><li>如果走直接插值路径，在有效解缠条件下构造中间相位、幅度，并使用匹配的合成滤波器重建。</li></ol>
 
-```
+~~~
 // 仅展示单个子带的局部插值；不是完整论文复现
 dphi = atan(sin(phi1-phi0), cos(phi1-phi0));
 phi_t = phi0 + t*dphi;
 amp_t = mix(amp0, amp1, t);
 response_t = amp_t * vec2(cos(phi_t), sin(phi_t));
-```
+~~~
 
 简单幅度线性插值和主值相位差只是教学基线。遮挡、混合纹理和大位移仍需额外处理。Meyer 等人的公开工作展示了相位表示用于帧插值的路径；本文并不声称上述片段完整重现该算法。
 
@@ -221,29 +218,29 @@ response_t = amp_t * vec2(cos(phi_t), sin(phi_t));
 
 Lucas–Kanade（LK）利用局部图像梯度迭代配准。这里采用平移窗口、前向加性更新作为参考：假设窗口内位移近似一致，并且当前估计足够接近真实运动。
 
-```
+~~~
 E(v) = Σᵢ wᵢ [I₁(qᵢ+v) - I₀(qᵢ)]²
 rᵢ = I₁(qᵢ+v) - I₀(qᵢ)
 Jᵢ = ∇I₁(qᵢ+v) [1×2]
 H = Σᵢ wᵢ JᵢᵀJᵢ [2×2]
 b = Σᵢ wᵢ Jᵢᵀrᵢ [2×1]
 H δv = -b；v ← v + δv
-```
+~~~
 
 亮度恒常不是所有游戏像素都成立：高光、透明、粒子、运动模糊及曝光变化会破坏它。H 的最小特征值可判断局部是否有足够的二维纹理；单独检测 determinant 很难区分全部退化情况。
 
 ### 从粗到细
 
-```
+~~~
 最粗层：初始化 v=0，或使用可验证的运动先验
 每层：Warp I₁ → 计算残差与梯度 → 求解 δv → 更新
 进入更细层：v_fine = 2 · bilinear(v_coarse)
 每层多次迭代，读写光流纹理 ping-pong
-```
+~~~
 
 下例每线程处理一个像素，5×5 窗口累加，做一次迭代。是教学版密集 LK 更新，区别于只追踪特征点的稀疏 LK。生产版本可用鲁棒权重、限步长、重算残差和更好的边界策略。
 
-```
+~~~
 #version 310 es
 precision highp float;
 layout(local_size_x=8, local_size_y=8) in;
@@ -282,7 +279,7 @@ void main() {
     // z：更新前平均残差；w：本次求解是否可信
     imageStore(flowOut,p,vec4(v+delta,residual/25.0,ok?1.0:0.0));
 }
-```
+~~~
 
 输入采样器需配置线性过滤与 clamp-to-edge；代码虽然标记边界无效，边缘采样仍依赖合法 sampler 配置。输出 z 是更新前残差，不能当作最终光流残差；最终 confidence Pass 应使用更新后的位移重新计算。
 
@@ -296,13 +293,13 @@ void main() {
 
 Forward Warp 从源像素投到中间位置：q=x₀+tF₀₁(x₀)。实现容易出现空洞、多源竞争与遮挡，需要 splat、归一化累积和可见性决策。Backward Warp 则从中间帧目标像素寻找源坐标，适合纹理 gather，但需要逆映射。
 
-```
+~~~
 从 I₀ 取样：q = x₀ + t F₀₁(x₀)
 从 I₁ 取样：q = x₁ + (1-t) F₁₀(x₁)
 固定点迭代：
 x₀ ← q - t F₀₁(x₀)
 x₁ ← q - (1-t) F₁₀(x₁)
-```
+~~~
 
 不能把定义在源网格上的 F₀₁(q) 当成精确的目标网格反向流。固定点迭代是在局部平滑、近似线性运动下的参考方法；运动边界可能不收敛，还应检查映射残差和源坐标合法性。这里只展示固定次数迭代的简化形式。
 
@@ -316,19 +313,19 @@ x₁ ← q - (1-t) F₁₀(x₁)
 
 <table><thead><tr><th>误差 / 检查</th><th>定义或用途</th><th>限制</th></tr></thead><tbody><tr><td>光度误差</td><td>eₚ(x)=|Y₀(x)-Y₁(x+F₀₁(x))|</td><td>曝光、高光会造成误判</td></tr><tr><td>前后向一致性</td><td>e_fb=‖F₀₁(x)+F₁₀(x+F₀₁(x))‖</td><td>采样位置必须对齐；双向一致仍可能同时错误</td></tr><tr><td>结构可靠性</td><td>LK 窗口 H 的最小特征值</td><td>平坦区域及单边缘存在歧义</td></tr><tr><td>逆映射残差</td><td>‖q-x₀-tF₀₁(x₀)‖</td><td>用于检查固定点求解结果</td></tr><tr><td>越界 / 遮挡</td><td>坐标有效性、前后向不一致及可见性线索</td><td>不能只靠 clamp 隐藏问题</td></tr></tbody></table>
 
-```
+~~~
 // 可标定的参考可信度，不是唯一标准
 c = valid * structureConfidence
     * exp(-e_photo/σp)
     * exp(-e_fb/σf)
     * exp(-e_inverse/σr)
-```
+~~~
 
 σp 使用亮度单位，σf/σr 使用像素单位；分辨率与金字塔层改变时阈值需要同步。阈值不应只凭单帧画面调参，应对快运动、亮度变化和遮挡分别标定。
 
 ### 可信度引导的双向融合
 
-```
+~~~
 // 中间帧像素 q；所有坐标/光流均为像素单位。
 // 线性运动、局部可逆条件下，用固定点迭代求源坐标。
 // sampleFlow()/sampleColor() 为双线性采样；内部处理边界。
@@ -346,7 +343,7 @@ if(t<=0.0) outColor=sampleColor(I0,q);
 else if(t>=1.0) outColor=sampleColor(I1,q);
 else if(w0+w1>1e-5) outColor=(w0*C0+w1*C1)/(w0+w1);
 else outColor=sampleColor(t<0.5?I0:I1,q); // 显式降级：可能跳变
-```
+~~~
 
 两帧颜色应在线性空间融合。HDR 下先做曝光对齐或使用稳健亮度变换用于估计误差；不要把未经对齐的亮度差直接解释成遮挡。UI 最好独立合成，镜头切换时禁用当前帧对的插值。
 
@@ -364,12 +361,12 @@ OpenGL ES 3.1 的 compute image 写入后，若后续 texture 读取，使用相
 
 8×8 线程组是参考起点。窗口邻域适合缓存复用，但 Warp 后的 img1 访问是运动相关的，不一定能直接用规则 shared-memory tile 覆盖。显式 shared memory 需要所有相关线程参与 barrier，边界线程不能提前返回而让其他线程卡在同步处。
 
-```
+~~~
 参考计算量 ∝ 2 × Σₗ (Wₗ Hₗ Kₗ k²)
 2：双向；Kₗ：迭代数；k：窗口边长
 金字塔总像素数（逐层减半）≈ 4/3 · W H
 单张全分辨率 RG16F 光流：4WH 字节
-```
+~~~
 
 1920×1080 时，一张 RG16F 光流约 7.9 MiB，双向约 15.8 MiB；实际还需 ping-pong、金字塔、误差与颜色资源。不要把这当成完整峰值显存。上述 LK 示例每窗口点需要多次纹理取样，访存可能比 2×2 方程求解更贵。
 
@@ -390,7 +387,6 @@ OpenGL ES 3.1 的 compute image 写入后，若后续 texture 读取，使用相
 <ul><li><a href="https://publications.ri.cmu.edu/an-iterative-image-registration-technique-with-an-application-to-stereo-vision-ijcai">Lucas &amp; Kanade, 1981 · 原始配准论文</a></li><li><a href="https://cgl.ethz.ch/publications/papers/paperMey15a.php">Meyer 等, CVPR 2015 · Phase-Based Frame Interpolation for Video</a></li><li><a href="https://people.csail.mit.edu/nwadhwa/phase-video/">Wadhwa 等, 2013 · Phase-Based Video Motion Processing</a></li></ul>
 
 公式、Shader 和 Pass 组织为本文整理的参考路径；公开论文用于概念出处，不等同于项目实现说明。
-
 {: .muted }
 
 </section>

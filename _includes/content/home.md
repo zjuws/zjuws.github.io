@@ -3,13 +3,11 @@
 <div class="hero-copy" markdown="1">
 
 GRAPHICS ENGINEERING / AI RENDERING
-
 {: .eyebrow }
 
 # 让每一帧，<br>更接近<span>可能。</span>
 
 我是王术，华为图形渲染工程师。<br>负责 GPU Turbo X 团队技术创新，<br>专注系统层游戏渲染加速与 AI 图像处理。
-
 {: .intro }
 
 <div class="actions" markdown="1">

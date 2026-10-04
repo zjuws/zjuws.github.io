@@ -5,7 +5,6 @@
 <div markdown="1">
 
 02 / FIELD NOTES
-
 {: .eyebrow }
 
 ## 游戏图形技术笔记
@@ -46,12 +45,12 @@
 
 设归一化纹理坐标为 (u, v)，纹理尺寸为 W × H。先把屏幕方向的 UV 梯度换成纹素单位：
 
-```
+~~~
 gx = (W · du/dx, H · dv/dx)
 gy = (W · du/dy, H · dv/dy)
 ρ  = max(length(gx), length(gy))
 λ  ≈ log₂(ρ)
-```
+~~~
 
 ρ = 4 表示一个屏幕像素在较大的方向上覆盖约 4 个纹素，因此 λ ≈ 2，对应缩小到原尺寸 1/4 的 MIP。ρ = 1 时 λ = 0。
 

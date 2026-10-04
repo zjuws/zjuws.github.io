@@ -5,7 +5,6 @@
 <div markdown="1">
 
 01 / SELECTED ENGINEERING WORK
-
 {: .eyebrow }
 
 ## 项目与商用实践
@@ -27,7 +26,6 @@
 </div>
 
 2024.06 — 至今
-
 {: .project-date }
 
 ### 游戏渲染加速 · AI / NPU
@@ -71,7 +69,6 @@
 </div>
 
 2020.06 — 2024.06
-
 {: .project-date }
 
 ### 游戏渲染加速 · 时空域降负载
@@ -113,7 +110,6 @@
 </div>
 
 2023.10 — 2024.06
-
 {: .project-date }
 
 ### 自研 2D 渲染引擎适配
@@ -155,7 +151,6 @@
 </div>
 
 2018.11 — 2019.12
-
 {: .project-date }
 
 ### 视频超分 · ShaderNN
@@ -197,7 +192,6 @@ GPU AI 超分能力落地华为畅连通话商用，支撑旗舰手机卖点发�
 </div>
 
 2016.08 — 2018.03
-
 {: .project-date }
 
 ### 自研 OS · 原生系统服务
@@ -235,7 +229,6 @@ AtelierOS 研发，鸿蒙 OS 前身。
 <div class="research-block" markdown="1">
 
 NEXT / AI RENDERING RESEARCH
-
 {: .eyebrow }
 
 ### 移动端实时神经渲染
