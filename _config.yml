@@ -1,0 +1,9 @@
+title: 王术 · 渲染技术实验室
+url: https://zjuws.github.io
+baseurl: ""
+markdown: kramdown
+kramdown:
+  input: Kramdown
+  syntax_highlighter: null
+exclude:
+  - README.md
